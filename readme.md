@@ -1,173 +1,143 @@
-# CVR Results Scraper API
 
-Welcome to the **CVR Results Scraper API** documentation. This API allows users to retrieve student results from a CVR results page by providing a link to the page and a list of student roll numbers. The API scrapes the required information and returns it as a JSON response.
+# CVR Results Scraper API Documentation
 
-## 📘 **Table of Contents**
-- [Introduction](#introduction)
-- [API Endpoint](#api-endpoint)
-- [Request Body](#request-body)
-- [Response](#response)
-- [Error Handling](#error-handling)
-- [Example Usage](#example-usage)
-- [Setup Instructions](#setup-instructions)
-
----
-
-## 📚 **Introduction**
-The **CVR Results Scraper API** is a Node.js service that leverages Puppeteer to scrape student results from a provided link. It captures essential details like roll number, name, subjects, grades, SGPA, and CGPA for each student listed in the roll numbers array.
-
-> **Note:** This service interacts with live web pages, so it may take a few seconds to complete the process depending on the page's loading speed and the number of roll numbers provided.
+## **Table of Contents**
+1. [Introduction](#introduction)
+2. [API Endpoint](#api-endpoint)
+3. [Request Body](#request-body)
+4. [Response](#response)
+5. [Error Handling](#error-handling)
+6. [Bypassing Cloudflare](#bypassing-cloudflare)
+7. [Local Setup Instructions](#local-setup-instructions)
+8. [License](#license)
 
 ---
 
-## 🚀 **API Endpoint**
+## **Introduction**
+The **CVR Results Scraper API** allows users to extract student results from the CVR results page by providing a URL to the page and a list of roll numbers. The API returns a detailed JSON response containing information such as student roll number, name, subject details, SGPA, and CGPA.
+
+---
+
+## **API Endpoint**
+
 **POST** `/getresults`
 
-This endpoint accepts a POST request with a JSON body containing the following required fields:
+### **Request Body**
+The request should be sent as a JSON object with the following properties:
 
----
+| Field         | Type    | Required | Description                                |
+|---------------|---------|----------|--------------------------------------------|
+| `link`        | string  | Yes      | The URL to the CVR results page. Must be a valid URL. |
+| `rollnumbers` | array   | Yes      | A list of roll numbers to be processed.    |
 
-## 📩 **Request Body**
-The request body must be in **JSON format** and should have the following structure:
-
+#### **Example Request**
 ```json
 {
-  "link": "<URL of the CVR results page>",
-  "rollnumbers": ["<RollNumber1>", "<RollNumber2>", "<RollNumber3>"]
-}
-```
-
-### 🔹 **Parameters**
-| **Parameter** | **Type** | **Required** | **Description** |
-|---------------|----------|--------------|------------------|
-| `link`        | String   | ✅ Yes       | URL of the CVR results page where the results are displayed. Must be a valid URL starting with `http` or `https`. |
-| `rollnumbers` | Array    | ✅ Yes       | Array of roll numbers for which results need to be fetched. Must be an array of strings. |
-
-**Example Request Body**
-```json
-{
-  "link": "https://example.com/results", 
-  "rollnumbers": ["123456", "789012", "345678"]
+  "link": "https://example.com/results-page",
+  "rollnumbers": ["20BCE1234", "20BCE5678", "20BCE9123"]
 }
 ```
 
 ---
 
-## 📦 **Response**
-If the request is successful, the API responds with a **200 OK** status and a JSON body containing the results for each roll number.
+## **Response**
+The response will be a JSON array containing the result for each roll number. Each result contains the following fields:
 
-### 🔹 **Response Format**
+| Field         | Type   | Description                                   |
+|---------------|--------|-----------------------------------------------|
+| `rollNumber`  | string | The roll number of the student.              |
+| `name`        | string | The name of the student.                     |
+| `subjects`    | array  | An array of subject details.                 |
+| `sgpa`        | float  | The SGPA of the student.                     |
+| `cgpa`        | float  | The CGPA of the student.                     |
+
+Each entry in the `subjects` array will have the following structure:
+
+| Field         | Type   | Description                                |
+|---------------|--------|--------------------------------------------|
+| `subject`     | string | The name of the subject.                   |
+| `grade`       | string | The grade received in the subject.        |
+| `status`      | string | The pass/fail status of the subject.      |
+| `credits`     | int    | The number of credits for the subject.    |
+
+#### **Example Response**
 ```json
 [
   {
-    "rollNumber": "123456",
+    "rollNumber": "20BCE1234",
     "name": "John Doe",
     "subjects": [
-      {"subject": "Mathematics", "grade": "A", "status": "Pass", "credits": 4},
-      {"subject": "Physics", "grade": "B", "status": "Pass", "credits": 3}
+      { "subject": "Mathematics", "grade": "A", "status": "Pass", "credits": 4 },
+      { "subject": "Physics", "grade": "B", "status": "Pass", "credits": 3 }
     ],
-    "sgpa": 8.75,
-    "cgpa": 8.42
+    "sgpa": 8.5,
+    "cgpa": 8.7
   },
   {
-    "rollNumber": "789012",
-    "name": "Jane Smith",
+    "rollNumber": "20BCE5678",
+    "name": "Jane Doe",
     "subjects": [
-      {"subject": "Mathematics", "grade": "B", "status": "Pass", "credits": 4},
-      {"subject": "Chemistry", "grade": "A", "status": "Pass", "credits": 3}
+      { "subject": "Mathematics", "grade": "B", "status": "Pass", "credits": 4 },
+      { "subject": "Physics", "grade": "A", "status": "Pass", "credits": 3 }
     ],
-    "sgpa": 9.00,
-    "cgpa": 8.89
+    "sgpa": 9.0,
+    "cgpa": 8.8
   }
 ]
 ```
 
-### 🔹 **Response Fields**
-| **Field**        | **Type**  | **Description** |
-|-----------------|-----------|-----------------|
-| `rollNumber`     | String    | Roll number of the student. |
-| `name`           | String    | Name of the student. |
-| `subjects`       | Array     | List of subjects with details like name, grade, status, and credits. |
-| `sgpa`           | Number    | Semester Grade Point Average. |
-| `cgpa`           | Number    | Cumulative Grade Point Average. |
+---
+
+## **Error Handling**
+The API returns error responses in the following scenarios:
+
+| Status Code | Description                                  |
+|-------------|----------------------------------------------|
+| 400         | Invalid or missing `link` or `rollnumbers`.  |
+| 500         | Server error or scraping issue.              |
 
 ---
 
-## ❌ **Error Handling**
-If something goes wrong during the request, the API responds with an appropriate error message and status code.
+## **Bypassing Cloudflare**
+The API uses **puppeteer-real-browser** to handle dynamic content and bypass Cloudflare's anti-bot protection. Key techniques used to bypass Cloudflare include:
 
-| **Error Code** | **Message**                             | **Reason**                    |
-|---------------|-----------------------------------------|--------------------------------|
-| 400           | "Invalid or missing link in request body." | The `link` is not provided or is not a valid URL. |
-| 400           | "Roll numbers are missing or not an array in request body." | The `rollnumbers` field is not an array or is missing. |
-| 500           | "Failed to scrape results."             | An unexpected error occurred during scraping. |
+1. **Using a Real Browser Instance**: 
+   - The API establishes a real browser session using Puppeteer. By using a real browser (not headless), it mimics actual user behavior.
 
-**Example Error Response**
-```json
-{
-  "error": "Roll numbers are missing or not an array in request body."
-}
-```
+2. **Handling JavaScript Challenges**:
+   - Cloudflare often presents JavaScript challenges. The **puppeteer-real-browser** library helps solve these challenges by allowing the browser to execute JavaScript naturally.
 
----
+3. **Waiting for Elements and Delays**:
+   - Custom delays are used to wait for elements on the page to load, allowing Cloudflare scripts to run.
 
-## 🛠️ **Example Usage**
-### **cURL Example**
-```bash
-curl -X POST http://localhost:3030/getresults \
--H "Content-Type: application/json" \
--d '{ 
-  "link": "https://example.com/results", 
-  "rollnumbers": ["123456", "789012", "345678"] 
-}'
-```
+4. **Automatic Turnstile Handling**:
+   - The `turnstile: true` option ensures that any challenges related to Turnstile CAPTCHA are automatically handled.
 
-### **JavaScript (Axios) Example**
-```javascript
-const axios = require('axios');
+5. **Custom Headers and User Agents**:
+   - Puppeteer can be configured to use custom headers and user agents to avoid being flagged as a bot.
 
-const data = {
-  link: "https://example.com/results",
-  rollnumbers: ["123456", "789012", "345678"]
-};
+6. **Waiting for Dynamic Content**:
+   - The scraper waits for specific elements to load (like input fields and buttons) before interacting with the page, ensuring all scripts from Cloudflare have been executed.
 
-axios.post('http://localhost:3030/getresults', data)
-  .then(response => {
-    console.log(response.data);
-  })
-  .catch(error => {
-    console.error('Error:', error.response.data);
-  });
-```
+**Note:** These techniques help in bypassing basic Cloudflare protection, but advanced bot protection may require further tuning, like using proxies, rotating IPs, or more sophisticated headless browser techniques.
 
 ---
 
-## 📦 **Setup Instructions**
-### **1. Clone the repository**
-```bash
-git clone https://github.com/your-repo/cvr-results-scraper.git
-cd cvr-results-scraper
-```
-
-### **2. Install dependencies**
-```bash
-npm install
-```
-
-### **3. Start the server**
-```bash
-node server.js
-```
-> The server will be running on **http://localhost:3030**
-
-### **4. Send API Requests**
-Use the API with **Postman**, **cURL**, or any HTTP client to send requests to `http://localhost:3030/getresults`.
+## **Local Setup Instructions**
+1. Install **Node.js** and **npm**.
+2. Install the required dependencies:
+   ```bash
+   npm install
+   ```
+3. Run the server:
+   ```bash
+   node server.js
+   //or
+   npm run start 
+   ```
+4. The API will be available at `http://localhost:3030/getresults`.
 
 ---
 
-## 🔥 **Notes**
-- The API uses Puppeteer to scrape information from a live page, so page load times can impact response time.
-- The service closes the browser after collecting results, ensuring efficient memory usage.
-- For larger lists of roll numbers, ensure you provide sufficient system resources and avoid multiple concurrent requests to prevent rate limits or blocking by the target site.
-
-**Happy Scraping! 🚀**
+## **License**
+This API is licensed under the MIT License. Please follow ethical practices and use the scraper only for educational or authorized purposes.
