@@ -1,0 +1,25 @@
+{
+  "name": "cvr-result-scraping",
+  "version": "1.0.0",
+  "type": "module",
+  "description": "web scraping for results in cvr page where end url and roll numbers to capture results",
+  "main": "index.js",
+  "scripts": {
+    "start": "nodemon index.js"
+  },
+  "keywords": [
+    "puppeteer"
+  ],
+  "author": "vijayreddylattupally",
+  "license": "ISC",
+  "dependencies": {
+    "body-parser": "^1.20.3",
+    "cors": "^2.8.5",
+    "express": "^4.21.2",
+    "nodemon": "^3.1.9",
+    "puppeteer": "^23.10.4",
+    "puppeteer-extra": "^3.3.6",
+    "puppeteer-extra-plugin-stealth": "^2.11.2",
+    "puppeteer-real-browser": "^1.3.20"
+  }
+}
