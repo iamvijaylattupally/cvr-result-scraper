@@ -1,6 +1,7 @@
 import { connect } from 'puppeteer-real-browser';
 import express from "express";
 import bodyParser from 'body-parser';
+import cors from "cors"
 
 const app = express();
 app.use(bodyParser.json());
@@ -9,6 +10,13 @@ app.use(bodyParser.urlencoded({ extended: true }));
 app.listen(3030, () => {
     console.log(`Port running at 3030`);
 });
+const corsOptions = {
+    origin: '*',
+    methods: ['GET', 'POST', 'PUT', 'DELETE'],
+    allowedHeaders: ['Content-Type', 'Authorization'],
+};
+app.use(cors(corsOptions));
+
 
 app.post("/getresults", async (req, res) => {
     const { link, rollnumbers } = req.body;
