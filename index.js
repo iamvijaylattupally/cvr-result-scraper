@@ -17,7 +17,9 @@ const corsOptions = {
 };
 app.use(cors(corsOptions));
 
-
+app.get("/",(req,res)=>{
+    res.send("Welcome to result scraper")
+})
 app.post("/getresults", async (req, res) => {
     const { link, rollnumbers } = req.body;
     console.log(link);
