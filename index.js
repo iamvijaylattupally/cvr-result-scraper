@@ -8,7 +8,7 @@ app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true }));
 
 app.listen(80, () => {
-    console.log(`Port running at 3030`);
+    console.log(`Port running at 80`);
 });
 const corsOptions = {
     origin: '*',
