@@ -7,7 +7,7 @@ const app = express();
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true }));
 
-app.listen(3030, () => {
+app.listen(80, () => {
     console.log(`Port running at 3030`);
 });
 const corsOptions = {
